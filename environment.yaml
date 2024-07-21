@@ -1,0 +1,21 @@
+name: score_norm_fairness
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pytorch
+  - scikit-learn
+  - pandas
+  - matplotlib
+  - h5py
+  - tqdm
+  - dask
+  - pip
+  # - scipy
+  # - numpy
+  # - setuptools
+  - pip:
+    - dask
+    - dask[dataframe]
+
