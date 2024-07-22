@@ -25,7 +25,7 @@ $ cd score_norm_paper
 
 ## Datasets & Pretrained Weights
 
-Download the protocols: https://seafile.ifi.uzh.ch/f/0fc877a36db84fdf9627/
+Download the protocols: https://seafile.ifi.uzh.ch/d/46473c78a796425a8022/
 
 Get access and download the datasets:
 - RFW: http://www.whdeng.cn/RFW/index.html
