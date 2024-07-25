@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 if [ ! -d features ]; then
-  mkdir features
+    mkdir features
 fi
 
 cd features
@@ -17,6 +17,6 @@ wget -O VGG2_short_E4.tar.gz "https://seafile.ifi.uzh.ch/d/46473c78a796425a8022/
 wget -O VGG2_short_E5.tar.gz "https://seafile.ifi.uzh.ch/d/46473c78a796425a8022/files/?p=%2Fpretrained_features%2FVGG2_features%2FVGG2_short_E5.tar.gz&dl=1"
 
 
-for f in "*.tar.gz"; do
-    echo tar -xzf $f;
+for f in *.tar.gz; do
+    tar -xzvf $f
 done
