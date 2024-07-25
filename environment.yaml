@@ -11,11 +11,11 @@ dependencies:
   - h5py
   - tqdm
   - dask
+  - setuptools
   - pip
   # - scipy
   # - numpy
-  # - setuptools
   - pip:
     - dask
     - dask[dataframe]
-
+    - -e . # Install this package as well

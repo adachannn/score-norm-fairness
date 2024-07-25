@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
 import os
-import pandas as pd
 import copy
 import numpy as np
 import torch
@@ -47,11 +45,11 @@ class RFW(torch.utils.data.Dataset):
 
     """
     def __init__(
-        self, 
-        data_directory, 
-        protocol_directory, 
-        protocol="original", 
-        data_type="image", 
+        self,
+        data_directory,
+        protocol_directory,
+        protocol="original",
+        data_type="image",
         train_sample=25,
         same_race=True,
     ):
@@ -65,7 +63,7 @@ class RFW(torch.utils.data.Dataset):
         data_type: str (image, feature)
 
         train_sample: int, number of cohort samples for z/t-norm per race
-        
+
         same_race: bool, if True, references for zprobe samples are from same race, to speed up training
         """
 
@@ -77,10 +75,10 @@ class RFW(torch.utils.data.Dataset):
             raise ValueError(
                 "Invalid or non existant `protocol_directory`: f{protocol_directory}"
             )
-        
+
         self._check_protocol(protocol)
         self._races = ["African", "Asian", "Caucasian", "Indian"]
-        
+
         self.data_directory = data_directory
         self.protocol_directory = protocol_directory
         self.protocol = protocol
@@ -118,7 +116,7 @@ class RFW(torch.utils.data.Dataset):
     def _load_testdata(self):
         for race in self._races:
             if self.protocol == "random":
-                final_destination = f"{race}_pairs_random.txt"                
+                final_destination = f"{race}_pairs_random.txt"
             elif self.protocol == "original":
                 final_destination = f"{race}_pairs.txt"
 
@@ -190,7 +188,7 @@ class RFW(torch.utils.data.Dataset):
     def probes(self):
 
         if self._cached_probes is None:
-            
+
             self._cached_probes = []
             for pair in self._inverted_pairs:
                 sset = self._make_sample(pair)
@@ -216,18 +214,18 @@ class RFW(torch.utils.data.Dataset):
         race, subject_id, reference_id = item.split("/")
 
         key = f"{race}/{subject_id}/{reference_id}"
-        
+
         if target_set == "train":
             reference_id = f"{subject_id}/{reference_id}"
             annotations = self._fetch_landmarks(
                 os.path.join(
-                    self.protocol_directory, 
+                    self.protocol_directory,
                     "train/protocol/all_annotations.csv",
                 ),
                 reference_id,
                 target_set,
             )
-            next_path = "norm/" + key 
+            next_path = "norm/" + key
         else:
             annotations = self._fetch_landmarks(
                 os.path.join(
@@ -237,7 +235,7 @@ class RFW(torch.utils.data.Dataset):
                 reference_id,
                 target_set,
             )
-            next_path = key 
+            next_path = key
 
         if self.extension == ".jpg":
             path = (
@@ -267,7 +265,7 @@ class RFW(torch.utils.data.Dataset):
             self._cached_zprobes = self._load_traindata(
                 self._protocol_seed + 1, "for_probes"
             )
-            
+
             if self.same_race:
                 reference_list = defaultdict(list)
                 for race in self._races:
@@ -275,19 +273,19 @@ class RFW(torch.utils.data.Dataset):
                         set([s["key"] for s in self.references() if s["race"] == race])
                     )
                     reference_list[race] = ref
-                
+
                 for p in self._cached_zprobes:
                     p["references"] = copy.deepcopy(reference_list[p["race"]])
 
             else:
                 references = list(
                     set([s["key"] for s in self.references()])
-                )               
+                )
                 for p in self._cached_zprobes:
                     p["references"] = copy.deepcopy(references)
 
         return self._cached_zprobes
-    
+
     def treferences(self):
         if self._cached_treferences is None:
             self._cached_treferences = self._load_traindata(
@@ -298,17 +296,17 @@ class RFW(torch.utils.data.Dataset):
     def cohort_based_trainsamples(self):
         if self._cached_coVSco_zprobes is None or self._cached_coVSco_references is None:
             self._cached_coVSco_zprobes, self._cached_coVSco_references = self._load_traindata(csv_type=None)
-        
+
         return self._cached_coVSco_zprobes, self._cached_coVSco_references
 
     def _load_traindata(self,seed=365,csv_type=None):
-        
+
         if csv_type is not None:
             cache = []
-            
+
             # Setting the seed so we have a consisent set of samples
             np.random.seed(seed)
-                
+
             protocol_dir = os.path.join(
                     self.protocol_directory, "train", "protocol", csv_type+".csv"
             )
@@ -328,22 +326,22 @@ class RFW(torch.utils.data.Dataset):
                 if self.train_sample == "all":
                     self.train_sample = len(ids)
                 subject_ids = ids[0 : self.train_sample]
-        
+
                 selected = []
 
-                with open(protocol_dir) as f:   
-                    next(f)             
+                with open(protocol_dir) as f:
+                    next(f)
                     for line in f.readlines():
                         line = line.split("\t")
                         key = line[0].split("/")
                         key = "/".join(key[2:])
-                        subject_id = line[1]   
-                        if (subject_id in subject_ids) and (selected.count(subject_id) < 1):  
+                        subject_id = line[1]
+                        if (subject_id in subject_ids) and (selected.count(subject_id) < 1):
                             cache.append(
                                 self._make_sample(
                                     key[:-4], target_set="train"
                                 )
-                            )  
+                            )
                             selected.append(subject_id)
             return cache
         else:
@@ -352,19 +350,19 @@ class RFW(torch.utils.data.Dataset):
                 for race in self._races:
 
                     final_destination = f"{race}_pairs.txt"
- 
+
                     protocol_dir = os.path.join(
                         self.protocol_directory, "train", "protocol", self.protocol, final_destination
-                    )     
+                    )
 
-                    with open(protocol_dir) as f:  
+                    with open(protocol_dir) as f:
                         for line in f.readlines():
 
                             id1, ref1, id2, ref2 = line.split("\t")
                             dict_key = f"{race}/{id1}/{ref1}"
                             dict_value = f"{race}/{id2}/{ref2.rstrip()}"
                             pairs[dict_key].append(dict_value)
-                
+
                 self._cached_coVSco_references = []
                 for key in pairs:
                     self._cached_coVSco_references.append(
@@ -378,10 +376,10 @@ class RFW(torch.utils.data.Dataset):
                     sset = self._make_sample(pair, target_set="train")
                     sset["references"] = [
                         key for key in invert_pairs[pair]
-                    ]           
-                    self._cached_coVSco_zprobes.append(sset) 
+                    ]
+                    self._cached_coVSco_zprobes.append(sset)
             return self._cached_coVSco_zprobes, self._cached_coVSco_references
-        
+
     def _fetch_landmarks(self, filename, key, target_set="test"):
         if key not in self._landmarks:
             if target_set == "test":
@@ -393,15 +391,15 @@ class RFW(torch.utils.data.Dataset):
                         splits = filename.split("/")
                         if ("train" in splits) and (("African" in splits) or ("Asian" in splits) or ("Indian" in splits)):
                             self._landmarks[k]["reye"] = (float(line[2]), float(line[1]))
-                            self._landmarks[k]["leye"] = (float(line[4]), float(line[3]))  
+                            self._landmarks[k]["leye"] = (float(line[4]), float(line[3]))
                             self._landmarks[k]["mouthright"] = (float(line[8]), float(line[7]))
-                            self._landmarks[k]["mouthleft"] = (float(line[10]), float(line[9]))                        
+                            self._landmarks[k]["mouthleft"] = (float(line[10]), float(line[9]))
                         else:
                             self._landmarks[k]["reye"] = (float(line[3]), float(line[2]))
                             self._landmarks[k]["leye"] = (float(line[5]), float(line[4]))
                             self._landmarks[k]["mouthright"] = (float(line[9]), float(line[8]))
-                            self._landmarks[k]["mouthleft"] = (float(line[11]), float(line[10]))   
-                        
+                            self._landmarks[k]["mouthleft"] = (float(line[11]), float(line[10]))
+
             else:
                 with open(filename) as f:
                     next(f)
@@ -413,9 +411,9 @@ class RFW(torch.utils.data.Dataset):
                         self._landmarks[k] = dict()
                         splits = filename.split("/")
                         self._landmarks[k]["reye"] = (float(line[3]), float(line[2]))
-                        self._landmarks[k]["leye"] = (float(line[5]), float(line[4]))    
+                        self._landmarks[k]["leye"] = (float(line[5]), float(line[4]))
                         self._landmarks[k]["mouthright"] = (float(line[9]), float(line[8]))
-                        self._landmarks[k]["mouthleft"] = (float(line[11]), float(line[10]))   
+                        self._landmarks[k]["mouthleft"] = (float(line[11]), float(line[10]))
         return self._landmarks[key]
 
     def __len__(self):

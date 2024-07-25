@@ -37,7 +37,7 @@ In case you find this package interesting, please cite the following publication
 $ git clone https://github.com/AIML-IfI/score-norm-fairness.git
 $ cd score-norm-fairness
 $ conda env create -f environment.yaml
-$ conda activate score_normalization
+$ conda activate score_norm_fairness
 ```
 
 ## License
@@ -123,31 +123,32 @@ The following command-line arguments are supported:
 Here are examples of how to run the pipeline:
 
 ```
-score_norm.py --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name race --dataset rfw --protocol original --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
+score-norm --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name race --dataset rfw --protocol original --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
 
-score_norm.py --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name race --dataset vgg2 --protocol vgg2-short-demo --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
+score-norm --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name race --dataset vgg2 --protocol vgg2-short-demo --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
 
-score_norm.py --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name gender --dataset vgg2 --protocol vgg2-short-demo --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
+score-norm --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name gender --dataset vgg2 --protocol vgg2-short-demo --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
 ```
 
 ### Evaluation
 
 ```
 # TMR
-evaluation/TMR/calculate_tmr.py -dir /path/to/SCORES -t TITLES -nt NUM_OF_THRESHOLDS -o /path/to/output
+tmr-table -s /path/to/SCORES -t TITLES -T NUM_OF_THRESHOLDS -o /path/to/output
 
 # WERM
-evaluation/WERM/werm_report.py -d rfw -dir /path/to/SCORES -t TITLES -o /path/to/output
+werm-report -d rfw -s /path/to/SCORES -t TITLES -o /path/to/output
 
 ```
 
 ## Supplemental
 
-Here we show the supplemental results that are promised in the paper
+Here we show the supplemental results that are promised in the paper.
 
 ### Stability of `random` protocol for RFW dataset
 
-We compute TMR and WERM for all methods on five randomly generated protocols, and assess their standard deviations across the five splits. Here, we show the average of these values among all methods, as well as the maximum and minimum.
+We compute TMR and WERM for all methods on five randomly generated protocols, and assess their standard deviations across the five splits.
+Here, we show the average of these values among all methods, as well as the maximum and minimum.
 
 |       |              | E1    | E2    | E3    | E5    |
 |-------|--------------|-------|-------|-------|-------|
@@ -162,7 +163,7 @@ We compute TMR and WERM for all methods on five randomly generated protocols, an
 
 This is an extended version of Table 4, shows the spread of FMR and FNMR, in addition to TMR and WERM values.
 
-#### VGGFace2 Gender
+#### VGGFace2 Gender:
 
 | **Network** | **E1** | **E1** | **E1** | **E1** | **E2** | **E2** | **E2** | **E2** | **E3** | **E3** | **E3** | **E3** | **E4** | **E4** | **E4** | **E4** | **E5** | **E5** | **E5** | **E5** |
 |-------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
@@ -176,7 +177,7 @@ This is an extended version of Table 4, shows the spread of FMR and FNMR, in add
 | M5          | 93.55  | 1.3906 | 1.6739 | 1.1553 | 95.44  | 1.1811 | 1.2595 | 1.1076 | 96.67  | 1.0505 | 1.0086 | 1.0942 | 96.88  | 1.0474 | 1.0804 | 1.0153 | 96.88  | 1.1871 | 1.3150 | 1.0717 |
 
 
-#### VGGFace2 Gender Balanced
+#### VGGFace2 Gender Balanced:
 
 | **Network** | **E1** | **E1** | **E1** | **E1** | **E2** | **E2** | **E2** | **E2** | **E3** | **E3** | **E3** | **E3** | **E4** | **E4** | **E4** | **E4** | **E5** | **E5** | **E5** | **E5** |
 |-------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
@@ -190,7 +191,7 @@ This is an extended version of Table 4, shows the spread of FMR and FNMR, in add
 | M5          | 93.06  | 1.4569 | 1.8298 | 1.1600 | 95.28  | 1.2022 | 1.3003 | 1.1115 | 96.67  | 1.0408 | 0.9901 | 1.0942 | 96.88  | 1.0483 | 1.0823 | 1.0153 | 96.88  | 1.2092 | 1.3645 | 1.0717 |
 
 
-#### VGGFace2 Race
+#### VGGFace2 Race:
 
 | **Network** | **E1** | **E1** | **E1** | **E1** | **E2** | **E2** | **E2** | **E2** | **E3** | **E3** | **E3** | **E3** | **E4** | **E4** | **E4** | **E4** | **E5** | **E5** | **E5** | **E5** |
 |-------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
@@ -205,7 +206,7 @@ This is an extended version of Table 4, shows the spread of FMR and FNMR, in add
 
 
 
-#### VGGFace2 Race Balanced
+#### VGGFace2 Race Balanced:
 
 | **Network** | **E1** | **E1** | **E1** | **E1** | **E2** | **E2** | **E2** | **E2** | **E3** | **E3** | **E3** | **E3** | **E4** | **E4** | **E4** | **E4** | **E5** | **E5** | **E5** | **E5** |
 |-------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
@@ -220,7 +221,7 @@ This is an extended version of Table 4, shows the spread of FMR and FNMR, in add
 
 
 
-#### RFW Original
+#### RFW Original:
 
 | **Network** | **E1** | **E1** | **E1** | **E1** | **E2** | **E2** | **E2** | **E2** | **E3** | **E3** | **E3** | **E3** | **E4** | **E4** | **E4** | **E4** | **E5** | **E5** | **E5** | **E5** |
 |-------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
@@ -234,7 +235,7 @@ This is an extended version of Table 4, shows the spread of FMR and FNMR, in add
 | M5          | 25.63  | 2.2587 | 4.7538  | 1.0732 | 62.54  | 2.5204 | 5.8430  | 1.0872 | 90.05  | 3.1712 | 7.7886  | 1.2912 | ---    | ---    | ---    | ---    | 89.50  | 1.6877 | 2.1090  | 1.3505 |
 
 
-#### RFW Random
+#### RFW Random:
 
 | **Network** | **E1** | **E1** | **E1** | **E1** | **E2** | **E2** | **E2** | **E2** | **E3** | **E3** | **E3** | **E3** | **E4** | **E4** | **E4** | **E4** | **E5** | **E5** | **E5** | **E5** |
 |-------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|

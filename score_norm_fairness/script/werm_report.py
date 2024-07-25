@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
 import matplotlib.pyplot as plt
-import json
 import numpy
 from matplotlib.backends.backend_pdf import PdfPages
 from collections import defaultdict
-from utils import compute_fmr_thresholds, split_scores_by_variable, farfrr, load_scores, compute_werm_geo
+from score_norm_fairness.evaluation import compute_fmr_thresholds, split_scores_by_variable, farfrr, load_scores, compute_werm_geo
+import argparse
 
 def compute_fmr_fnmr_tradeoff(
     negatives,
@@ -31,7 +30,7 @@ def compute_fmr_fnmr_tradeoff(
 
       fmr_thresholds: list
         List containing the FMR operational points
-        
+
       fair_fn: function
         Function computing the fairness and its components
 
@@ -62,7 +61,7 @@ def compute_fmr_fnmr_tradeoff(
 
     # for key in positives_as_dict:
     for key in negatives_as_dict:
-     
+
         fmrs[key] = []
         if key in positives_as_dict:
             fnmrs[key] = []
@@ -164,7 +163,7 @@ def plot_demographic_boxplot(
         Getting the scores as numpy arrays,
         so we can plot using matplotlib
         """
-       
+
         scores = dict()
         for n in negatives_as_dict:
 
@@ -176,7 +175,7 @@ def plot_demographic_boxplot(
                 else []
             )
 
-            scores[n] = [negatives, positives]        
+            scores[n] = [negatives, positives]
         return scores
 
     def _plot(scores, axes, labels):
@@ -349,15 +348,15 @@ def plot_scaled_fnmrs_fmrs_tradeoff(
 
       title: str
         Plot title
-        
+
       cached_fnmrs: list
-        Set of precomputed fnmrs. 
+        Set of precomputed fnmrs.
 
       cached_fmrs: list
-        Set of precomputed fmrs. 
+        Set of precomputed fmrs.
     """
     title = f"System: {title}. (Scaled) FMR and FNMR trade-off"
-    
+
     rates = {"fnmr": cached_fnmrs, "fmr":cached_fmrs}
     fig, ax = plt.subplots(figsize=(16, 8))
     fig.suptitle(title)
@@ -367,7 +366,7 @@ def plot_scaled_fnmrs_fmrs_tradeoff(
     plt.ylabel("$FNMR(Scaled)(\\tau)$", fontsize=18)
 
     plt.grid(True)
-    
+
     axes = plt.subplot(2, 1, 2)
     [plt.semilogx(fmr_thresholds, rates["fmr"], label="fmr")]
     plt.ylabel("$FMR(Scaled)(\\tau)$", fontsize=18)
@@ -387,18 +386,18 @@ def plot_fair(
     cached_fairness=None,
 ):
     """
-    Plot fairness 
+    Plot fairness
 
     Parameters
     ----------
       fmr_thresholds: list
         List containing the FMR operational points
-        
+
       labels: list
-        List containing the labels for each line 
+        List containing the labels for each line
 
       cached_fairness: list
-        Set of precomputed fairness values. 
+        Set of precomputed fairness values.
     """
 
     fig, ax = plt.subplots(figsize=(8,6))
@@ -444,17 +443,17 @@ def standard_report(
 
       output_filename: str
         Output name of the report
-    
+
       variable_suffix: str
         The suffix of a variable that will be appended to `bio_ref_[variable_suffix]` for biometric references
         and `probe_[variable_suffix]` that will be appended to probes.
 
       fmr_thresholds: list
         List containing the FMR operational points
-        
+
       titles: list
         List containing titles for each score file
-      
+
       lookup_table: dict
         Dictionary containing demographic pairs
 
@@ -476,7 +475,7 @@ def standard_report(
     for i, (n, p) in enumerate(
         zip(negatives, positives)
     ):
- 
+
         n = n.persist()
         p = p.persist()
 
@@ -520,7 +519,7 @@ def standard_report(
         cached_fairness.append(fairness)
 
         pdf.savefig(fig)
-    
+
         fig = plot_scaled_fnmrs_fmrs_tradeoff(
             fmr_thresholds,
             title,
@@ -535,9 +534,9 @@ def standard_report(
         cached_fairness=cached_fairness,
     )
     pdf.savefig(fig)
-    
+
     pdf.close()
-    
+
     import json
     with open(file_name+".json","a+") as f:
         json.dump(fairness_dict, f)
@@ -549,8 +548,6 @@ def rfw_report(
     titles=None,
     fair_fn=compute_werm_geo,
 ):
-    scores = scores.split(",")
-    titles = titles.split(",")
     variables = {
         "Asian": "Asian",
         "African": "African",
@@ -562,7 +559,7 @@ def rfw_report(
     for a in list(variables.keys()):
         for b in list(variables.keys()):
             lookup_table[f"{a}__{b}"] = f"{variables[a]}-{variables[b]}"
- 
+
     variable_suffix = "race"
 
     negatives, positives = load_scores(scores)
@@ -586,8 +583,6 @@ def vgg2_report(
     fair_fn=compute_werm_geo,
     titles=None,
 ):
-    scores = scores.split(",")
-    titles = titles.split(",")
     if variable_suffix == "race":
         variables = {
             "A": "Asian",
@@ -623,33 +618,32 @@ def vgg2_report(
 
 
 
-import argparse
 def get_args(command_line_options = None):
-    
+
     parser = argparse.ArgumentParser("WERM_report",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    
-    parser.add_argument("--dataset","-d", default = "rfw", type=str, help = "Dataset, possible choices: rfw, vgg2") 
-    parser.add_argument("--scores_directory","-dir", default = None, type=str, help = "A comma-separated list of directories for csv scores files")
-    parser.add_argument("--variable_suffix","-var", default = "race", type=str, help = "Demographic group name used to compute fairness, used only for VGGFace2 dataset, posible choices: race, gender")
-    parser.add_argument("--titles","-t", default = None, type=str, help = "A comma-separated list of titles correspond to the scores")
-    parser.add_argument("--output_filename","-o", default = None, type=str, help = "OUTPUT pdf file path, to save all generated plots")
+
+    parser.add_argument("--dataset","-d", choices=("rfw", "vgg2"), default = "rfw", help = "Dataset, possible choices: rfw, vgg2")
+    parser.add_argument("--scores-directories","-s", nargs="+", required=True, help = "A space-separated list of directories for csv scores files")
+    parser.add_argument("--titles","-t", nargs="+", required=True, help = "A space-separated list of titles correspond to the scores")
+    parser.add_argument("--variable-suffix","-v", choices=("race", "gender"), default = "race", type=str, help = "Demographic group name used to compute fairness, used only for VGGFace2 dataset, posible choices: race, gender")
+    parser.add_argument("--output-filename","-o", default = "werm_report.pdf", type=str, help = "OUTPUT pdf file path, to save all generated plots")
 
     args = parser.parse_args(command_line_options)
 
     return args
 
 
-if __name__ == '__main__':
+def main():
     args = get_args()
     if args.dataset == "rfw":
         rfw_report(
-            scores = args.scores_directory,
+            scores = args.scores_directories,
             output_filename = args.output_filename,
             titles=args.titles,
         )
     elif args.dataset == "vgg2":
         vgg2_report(
-            scores = args.scores_directory,
+            scores = args.scores_directories,
             output_filename = args.output_filename,
             variable_suffix = agrs.variable_suffix,
             titles=args.titles,

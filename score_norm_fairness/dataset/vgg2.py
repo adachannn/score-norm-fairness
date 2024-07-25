@@ -1,16 +1,12 @@
-#!/usr/bin/env python
-
 import os
 import pandas as pd
-import numpy as np
-from collections import defaultdict
 import torch
 
 
 class VGG2(torch.utils.data.Dataset):
     """
     This is an extension version of VGG2 implementation defined in bob.bio.face, which proposed by Idiap Research Institute.
-    
+
     The VGG2 Dataset is composed of 9131 people split into two sets.
     The training set contains 8631 identities, while the test set contains 500 identities.
 
@@ -27,9 +23,9 @@ class VGG2(torch.utils.data.Dataset):
     Notice that we remove the identities with race label U and N, so in total 487 subjects.
 
     Relying on the available protocols from bob.bio.face, we develop two protocols `vgg2-short-demo`, `vgg2-full-demo`. Two protocols varie with respect to the number of samples per identity.
-    
+
     The `vgg2-full-demo` preserves the number of samples per identity from the original dataset.
-    On the other hand, the `vgg2-short-demo` presents 10 samples per identity at the probe and training sets. This is the one presents in our paper. 
+    On the other hand, the `vgg2-short-demo` presents 10 samples per identity at the probe and training sets. This is the one presents in our paper.
 
     All the landmarks and face crops provided in the original dataset is provided with this inteface.
 
@@ -50,10 +46,10 @@ class VGG2(torch.utils.data.Dataset):
 
     def __init__(
         self,
-        data_directory, 
-        protocol_directory, 
-        protocol="vgg2-short-demo", 
-        data_type="image", 
+        data_directory,
+        protocol_directory,
+        protocol="vgg2-short-demo",
+        data_type="image",
         same_demo_test=None,
         same_demo_train=None,
     ):
@@ -66,7 +62,7 @@ class VGG2(torch.utils.data.Dataset):
         protocol: str (vgg2-short-demo, vgg2-full-demo), protocol name
 
         data_type: str (image, feature)
-        
+
         same_race_test: str (None, race, gender), if True, references for probe samples are from same demo, to speed up training
 
         same_race_train: str (None, race, gender), if True, references for zprobe samples (cohort/training samples) are from same demo, to speed up training
@@ -79,11 +75,11 @@ class VGG2(torch.utils.data.Dataset):
             raise ValueError(
                 "Invalid or non existant `protocol_directory`: f{protocol_directory}"
             )
-        
+
         # self._check_protocol(protocol)
         self._races = ["B", "A", "W", "I"]
         self._genders = ["M","F"]
-        
+
         self.data_directory = data_directory
         self.protocol_directory = protocol_directory
         self.protocol = protocol
@@ -100,18 +96,18 @@ class VGG2(torch.utils.data.Dataset):
         self._cached_coVSco_zprobes = None
 
     def annotation(self,landmarks):
-        
+
         lm = dict()
 
         lm["reye"] = (landmarks["REYE_Y"], landmarks["REYE_X"])
-        lm["leye"] = (landmarks["LEYE_Y"], landmarks["LEYE_X"])  
+        lm["leye"] = (landmarks["LEYE_Y"], landmarks["LEYE_X"])
         lm["mouthright"] = (landmarks["RMOUTH_Y"], landmarks["RMOUTH_X"])
         lm["mouthleft"] = (landmarks["LMOUTH_Y"], landmarks["LMOUTH_X"])
         lm["nose"] = (landmarks["NOSE_Y"], landmarks["NOSE_X"])
         lm["topleft"] = (landmarks["FACE_Y"], landmarks["FACE_X"])
         lm["size"] = (landmarks["FACE_X"], landmarks["FACE_W"])
 
-        return lm 
+        return lm
 
     def probes(self):
 
@@ -164,7 +160,7 @@ class VGG2(torch.utils.data.Dataset):
                 key + self.extension,
             )
         )
-        
+
 
         sample = {"path":path,"key":key,"annotation":annotations,"reference_id":reference_id,"subject_id":subject_id,"race":item["RACE"],"gender":item["GENDER"],"annotation":annotations}
 
@@ -172,7 +168,7 @@ class VGG2(torch.utils.data.Dataset):
 
 
     def treferences(self):
-        
+
         if self._cached_treferences is None:
             for_tnorm = os.path.join(self.protocol_directory,self.protocol,"norm","for_models_norm.csv")
             for_tnorm = pd.read_csv(for_tnorm)
@@ -180,7 +176,7 @@ class VGG2(torch.utils.data.Dataset):
             for _, row in for_tnorm.iterrows():
                 row_dict = row.to_dict()
                 self._cached_treferences.append(self._make_sample(row_dict))
-        
+
         return self._cached_treferences
 
 
@@ -237,7 +233,7 @@ class VGG2(torch.utils.data.Dataset):
 
         if self._cached_coVSco_references is None:
             self._cached_coVSco_references = self.treferences()
-        
+
         return self._cached_coVSco_zprobes, self._cached_treferences
 
     def protocols():
@@ -245,12 +241,3 @@ class VGG2(torch.utils.data.Dataset):
             "vgg2-short-demo",
             "vgg2-full-demo",
         ]
-
-
-# vgg_test = VGG2(data_directory="/local/scratch/datasets/VGGFace2",protocol_directory="/local/scratch/linghu/score-norm/seafile/scorenorm_dataset_protocol/protocols/VGGFace2",transform=None,protocol="vgg2-short-demo",data_type="image",train_type="znorm", train_sample=25,same_demo=False)
-# ref = vgg_test.references()
-# probe = vgg_test.probes()
-# zprobe, tref = vgg_test.cohort_based_trainsamples()
-# breakpoint()
-# zprobe = vgg_test.zprobes()
-# tref = vgg_test.treferences()

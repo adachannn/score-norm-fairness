@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
 import argparse
-import sys
-sys.path.append("..")
 import os
-from postprocess import normalize
-from score import vgg_score, rfw_score
+from score_norm_fairness.postprocess import normalize
+from score_norm_fairness.score import vgg_score, rfw_score
 
 def pipeline(args):
 
@@ -88,6 +85,6 @@ def get_args(command_line_options = None):
     return args
 
 
-if __name__ == '__main__':
+def main():
     args = get_args()
     pipeline(args)

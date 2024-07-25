@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-import sys
-sys.path.append("..")
-import pandas as pd 
-import os 
+import pandas as pd
+import os
 import h5py
-from score_norm_fairness.dataset import RFW, VGG2
+from .dataset import RFW, VGG2
 from collections import defaultdict
 from tqdm import tqdm
 from scipy.spatial.distance import cdist
@@ -24,7 +21,7 @@ def load_features(sampleset):
                 sampleset_features[sample["key"]]["feature"] = h5_file[next(iter(h5_file))][()]
         except Exception as e:
             print(f"Failed to load {sample['path']}: {e}")
-    return sampleset_features 
+    return sampleset_features
 
 
 
@@ -33,13 +30,13 @@ def compute_scores(probes,gallery,all_vs_all=False,same_demo_compare=None):
     Compute the cosine similarity scores between probe samples and gallery samples
 
     Probe: List of dictionaries of probe samples
-    
+
     Gallery: List of dictionaries of gallery samples
-    
+
     all_vs_all: Bool, if True, ignore `references` of probe sample and compare all gallery samples with all probe samples; if False, compare the gallery samples listed in `references` of each probe sample
 
     same_demo_compare: str (None, race, gender), when all_vs_all is True, set same_demo_compare can ignore the cross demo pairs and speed up the computation when cross demo pairs are not necessary
-    
+
     Return: dictionary of scores
     """
     scores = defaultdict(dict)
@@ -87,7 +84,7 @@ def save(scores,output):
     Convert the scores in to a dataframe format and save to a csv file
 
     scores: dictionary of scores
-    
+
     output: path to save the csv file
     """
 
@@ -109,11 +106,11 @@ def save(scores,output):
 
     df = df.reindex(columns=["probe_key","probe_reference_id","probe_subject_id","probe_race","probe_gender","bio_ref_reference_id","bio_ref_subject_id","bio_ref_race","bio_ref_gender","score"])
 
-    df.to_csv(output,header=True,index=False)  
+    df.to_csv(output,header=True,index=False)
 
 
 def standard_score(data,output=None,file_name=None,compare_type=("cohort","test"),same_demo_compare=None):
-    
+
     probe = data.probes()
     ref = data.references()
     probe_features = load_features(probe)
@@ -121,9 +118,9 @@ def standard_score(data,output=None,file_name=None,compare_type=("cohort","test"
 
     raw_scores = compute_scores(probe_features,ref_features)
     os.makedirs(output, exist_ok=True)
-    
+
     save(raw_scores,os.path.join(output,"raw.csv"))
-    
+
     if file_name:
         if compare_type == ("cohort","test"):
             tref = data.treferences()
@@ -143,7 +140,7 @@ def standard_score(data,output=None,file_name=None,compare_type=("cohort","test"
             norm_scores = compute_scores(zprobe_features,tref_features,all_vs_all,same_demo_compare)
 
         save(norm_scores,os.path.join(output,file_name)+".csv")
-    
+
 
 def rfw_score(data_directory,protocol_directory,protocol,train_sample,same_race,output=None,file_name=None,compare_type=("cohort","test")):
 
@@ -160,7 +157,7 @@ def rfw_score(data_directory,protocol_directory,protocol,train_sample,same_race,
 
 
 def vgg_score(data_directory,protocol_directory,same_demo_test=None,same_demo_train=None,output=None,file_name=None,compare_type=("cohort","test")):
-    
+
     data = VGG2(data_directory=data_directory,protocol_directory=protocol_directory,data_type="feature", same_demo_test=same_demo_test, same_demo_train=same_demo_train)
     standard_score(
         data=data,

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "score-norm-fairness"
+version = "0.1.0"
+authors = [
+    {name="Yu Linghu", email="linghu@ifi.uzh.ch"},
+    { name="Manuel Guenther", email="siebenkopf@googlemail.com"},
+]
+description = "Source code for paper Score Normalization for Demographic Fairness in Face Recognition"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+score-norm    = "score_norm_fairness.script.score_norm:main"
+werm-report   = "score_norm_fairness.script.werm_report:main"
+tmr-table     = "score_norm_fairness.script.tmr_table:main"
+
+
+[project.urls]
+"Homepage" = "https://github.com/AIML-IfI/score-norm-fairness"
+"Bug Tracker" = "https://github.com/AIML-IfI/score-norm-fairness/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["score_norm_fairness"]
+namespaces = false
