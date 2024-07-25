@@ -1,35 +1,70 @@
 # Score Normalization for Demographic Fairness in Face Recognition
-This repository contains the implementation of score normalization methods mentioned in the paper. The pipeline supports various methods for score normalization based on demographic information.
+This repository contains the implementation of score normalization methods mentioned in the paper: "Score Normalization for Demographic Fairness in Face Recognition" presented at the International Joint Conference on Biometrics (IJBC) 2024.
+The pipeline supports various methods for score normalization based on demographic information.
+In case you find this package interesting, please cite the following publication:
+
+    @inproceedings{linghu2024score,
+        title     = {Score Normalization for Demographic Fairness in Face Recognition},
+        author    = {Linghu, Yu and de Freitas Pereira, Tiago and Ecabert, Christophe and Marcel, S\'ebastien and G\"unther, Manuel},
+        booktitle = {International Joint Conference on Biometrics (IJCB)},
+        year      = {2024},
+        note      = {\textbf{to appear}}
+    }
 
 
 ## Abstract
-Fair biometric algorithms have similar verification performance across different demographic groups given a single decision threshold. Unfortunately, for state-of-the-art face recognition networks, score distributions differ between demographics. Contrary to work that tries to align those distributions by extra training or fine-tuning, we solely focus on score post-processing methods. As proved, well-known sample-centered score normalization techniques, Z-norm and T-norm, do not improve fairness for high-security operating points. Thus, we extend the standard Z/T-norm to integrate demographic information in normalization. Additionally, we investigate several possibilities to incorporate cohort similarities for both genuine and impostor pairs per demographic to improve fairness across different operating points. We run experiments on two datasets with different demographics (gender and ethnicity) and show that our techniques generally improve the overall fairness of five state-of-the-art pre-trained face recognition networks, without downgrading verification performance. We also indicate that an equal contribution of False Match Rate (FMR) and False Non-Match Rate (FNMR) in fairness evaluation is required for the highest gains.
+    Fair biometric algorithms have similar verification performance across different demographic groups given a single decision threshold.
+    Unfortunately, for state-of-the-art face recognition networks, score distributions differ between demographics.
+    Contrary to work that tries to align those distributions by extra training or fine-tuning, we solely focus on score post-processing methods.
+    As proved, well-known sample-centered score normalization techniques, Z-norm and T-norm, do not improve fairness for high-security operating points.
+    Thus, we extend the standard Z/T-norm to integrate demographic information in normalization.
+    Additionally, we investigate several possibilities to incorporate cohort similarities for both genuine and impostor pairs per demographic to improve fairness across different operating points.
+    We run experiments on two datasets with different demographics (gender and ethnicity) and show that our techniques generally improve the overall fairness of five state-of-the-art pre-trained face recognition networks, without downgrading verification performance.
+    We also indicate that an equal contribution of False Match Rate (FMR) and False Non-Match Rate (FNMR) in fairness evaluation is required for the highest gains.
 
 
 ## Table of Contents
 - [Installation](#installation)
+- [License](#license)
 - [Dataset](#dataset)
 - [Usage](#usage)
 - [Supplemental](#supplemental)
-- [License](#license)
 
 
 ## Installation
 
 ```
-$ git clone https://github.com/AIML-IfI/score-norm-fairness.git 
+$ git clone https://github.com/AIML-IfI/score-norm-fairness.git
+$ cd score-norm-fairness
 $ conda env create -f environment.yaml
 $ conda activate score_normalization
-$ cd score_norm_paper
 ```
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 
 ## Datasets & Pretrained Weights
 
-Download the protocols: https://seafile.ifi.uzh.ch/d/46473c78a796425a8022/
+This package can be used in various ways.
+The protocol files are always required, so please [download these protocol files](https://seafile.ifi.uzh.ch/d/46473c78a796425a8022) and extract them into the current directory.
 
+### Running with pre-extracted features
+
+The easiest way is to make use of our pre-extracted features, which you can [download from here](https://seafile.ifi.uzh.ch/f/0fc877a36db84fdf9627)
+and extract them into the current directory.
+These are the exact features used to generate the results shown in the paper.
+
+### Extracting features by yourself
+
+In case you want to run the system end-to-end, you can download the original data and the models yourself, and extract the features.
+
+#### Datasets:
 Get access and download the datasets:
-- RFW: http://www.whdeng.cn/RFW/index.html
-- VGGFace2: https://github.com/ox-vgg/vgg_face2
+- [RFW](http://www.whdeng.cn/RFW/index.html)
+- [VGGFace2](https://github.com/ox-vgg/vgg_face2)
+
+#### Pre-trained models:
 
 Download the pretrained weights used in the paper:
 
@@ -44,12 +79,18 @@ Download the pretrained weights used in the paper:
 - E1 & E2: http://www.whdeng.cn/RFW/model.html
 - E3: https://github.com/mk-minchul/AdaFace
 - E4: https://github.com/IrvingMeng/MagFace
-- E5: DaliID: Distortion-adaptive learned invariance for identification – a robust technique for face recognition and person re-identification.
+- E5: DaliID: https://github.com/Gabrielcb/DaliID
 
-Besides, you can download the extracted features from https://seafile.ifi.uzh.ch/f/0fc877a36db84fdf9627/, which are used to generate the results shown in the paper.
+[//]: # (Distortion-adaptive learned invariance for identification – a robust technique for face recognition and person re-identification.)
+
+#### Extract features:
+
+
+
+
 
 ## Usage
-With the preassumption that you have the extracted features ready, we introduce the pipeline to compute the cosine similarity scores from extracted features, compute normalization statistics from cohort scores, and apply those statistics to normalize raw scores. 
+With the preassumption that you have the extracted features ready, we introduce the pipeline to compute the cosine similarity scores from extracted features, compute normalization statistics from cohort scores, and apply those statistics to normalize raw scores.
 
 You can directly download the features that we used, or extract features with your own pretrained networks.
 
@@ -67,14 +108,14 @@ Besides, it is possible to compute TMRs and generate WERM report from generated 
 
 The following command-line arguments are supported:
 
-	•	--stage, -stg: A comma-separated list of stages. Possible choices: train, test. If train, generate raw scores and cohort scores; if test, use cohort scores to compute statistics to normalize raw scores. Default: train,test
-	•	--methods, -m: A comma-separated list of score normalization methods to be applied. Possible choices: M1, M1.1, M1.2, M2, M2.1, M2.2, M3, M4, M5. Default: M1
-	•	--demo_name, -demo: Specific demographic to be used for normalization. Possible choices: race, gender. Default: race
-	•	--dataset, -d: Dataset to be used. Possible choices: rfw, vgg2. Default: rfw
-	•	--protocol, -p: Specify the protocol for dataset. Possible choices for rfw: original, random; possible choices for vgg2: vgg2-short-demo, vgg2-full-demo Default: original
-	•	--data_directory, -dr: Directory containing the dataset/images. Default: None (Must be provided by the user)
-	•	--protocol_directory, -pr: Directory containing the protocols. Default: None (Must be provided by the user)
-	•	--output_directory, -o: Directory for output files. All CSV scores files, including raw scores, cohort scores, and normalized scores, will be saved here. Default: None (Must be provided by the user)
+  -	--stages, -s: A space-separated list of stages. Possible choices: train, test. If train, generate raw scores and cohort scores; if test, use cohort scores to compute statistics to normalize raw scores. Default: train test
+  -	--methods, -m: A space-separated list of score normalization methods to be applied. Possible choices: M1, M1.1, M1.2, M2, M2.1, M2.2, M3, M4, M5. Default: M1
+  -	--demo-name, -n: Specific demographic to be used for normalization. Possible choices: race, gender. Default: race
+  - --dataset, -d: Dataset to be used. Possible choices: rfw, vgg2. Default: rfw
+  -	--protocol, -p: Specify the protocol for dataset. Possible choices for rfw: original, random; possible choices for vgg2: vgg2-short-demo, vgg2-full-demo Default: original
+  -	--data-directory, -D: Directory containing the dataset/images. Default: None (Must be provided by the user)
+  -	--protocol-directory, -P: Directory containing the protocols. Default: None (Must be provided by the user)
+  -	--output-directory, -o: Directory for output files. All CSV scores files, including raw scores, cohort scores, and normalized scores, will be saved here. Default: None (Must be provided by the user)
 
 
 ### Example
@@ -82,11 +123,11 @@ The following command-line arguments are supported:
 Here are examples of how to run the pipeline:
 
 ```
-score_norm.py --stage train,test --methods M1.1,M2.1,M3,M4,M5 --demo_name race --dataset rfw --protocol original --data_directory /path/to/data --protocol_directory /path/to/protocols --output_directory /path/to/output
+score_norm.py --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name race --dataset rfw --protocol original --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
 
-score_norm.py --stage train,test --methods M1.1,M2.1,M3,M4,M5 --demo_name race --dataset vgg2 --protocol vgg2-short-demo --data_directory /path/to/data --protocol_directory /path/to/protocols --output_directory /path/to/output
+score_norm.py --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name race --dataset vgg2 --protocol vgg2-short-demo --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
 
-score_norm.py --stage train,test --methods M1.1,M2.1,M3,M4,M5 --demo_name gender --dataset vgg2 --protocol vgg2-short-demo --data_directory /path/to/data --protocol_directory /path/to/protocols --output_directory /path/to/output
+score_norm.py --stage train test --methods M1.1 M2.1 M3 M4 M5 --demo-name gender --dataset vgg2 --protocol vgg2-short-demo --data-directory /path/to/data --protocol-directory /path/to/protocols --output-directory /path/to/output
 ```
 
 ### Evaluation
@@ -205,6 +246,3 @@ This is an extended version of Table 4, shows the spread of FMR and FNMR, in add
 | M3          | 64.25  | 1.7578 | 2.1090  | 1.4651 | 89.30  | 2.2723 | 2.6734  | 1.9314 | 98.09  | 1.6354 | 1.6134  | 1.6576 | ---    | ---    | ---    | ---    | 98.42  | 2.0688 | 2.3200  | 1.8448 |
 | M4          | 64.11  | 1.7085 | 2.1090  | 1.3840 | 90.84  | 2.6720 | 4.7396  | 1.5064 | 98.06  | 2.5022 | 5.8430  | 1.0716 | ---    | ---    | ---    | ---    | 98.31  | 4.8942 | 20.8191 | 1.1505 |
 | M5          | 60.57  | 2.5452 | 5.8430  | 1.1087 | 86.83  | 3.4545 | 9.4980  | 1.2564 | 97.46  | 6.7419 | 32.2388 | 1.4099 | ---    | ---    | ---    | ---    | 97.21  | 5.0545 | 20.8191 | 1.2272 |
-
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
