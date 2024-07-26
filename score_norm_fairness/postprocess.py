@@ -1,19 +1,20 @@
 import os
 import pandas as pd
 import numpy
+from tqdm import tqdm
 from scipy.stats import norm
 from scipy.special import expit
 from sklearn.linear_model import LogisticRegression
 
 
 def read_scores(directory):
-    
+
     df = pd.read_table(directory, delimiter=",")
 
     return df
 
 def save(df,output):
-    
+
     df.set_index(df.iloc[:, 0],inplace=True)
     df = df.drop(columns=["probe_key"])
     df.to_csv(output,header=True, index=True, sep=",", mode='w')
@@ -44,8 +45,8 @@ def compute_stats(raw,cohort,demo_name,demo,method):
 
         post_scores = pd.DataFrame()
         ## iterate for all demographic groups, compute statistic within each group and normalize scores with gallery subject from this specific group, regardless of the demographic group for probe subject
-        for r in demo:
-            
+        for r in tqdm(demo):
+
             # df = cohort[(cohort[f"probe_{demo_name}"] == cohort[f"bio_ref_{demo_name}"]) & (cohort[f"bio_ref_{demo_name}"] == r)]
             # post_processed = raw[(raw[f"probe_{demo_name}"] == raw[f"bio_ref_{demo_name}"]) & (raw[f"bio_ref_{demo_name}"] == r)]
 
@@ -91,15 +92,15 @@ def compute_stats(raw,cohort,demo_name,demo,method):
 
                 impostor_mean = impostor["score"].mean()
                 impostor_std = impostor["score"].std()
-                
+
                 post_processed["score"] = (post_processed["score"] - impostor_mean) / impostor_std
 
             post_scores = pd.concat([post_scores,post_processed])
-    
+
     else: ## methods that take cross demographic impostor scores
 
         post_scores = pd.DataFrame()
-        
+
         ## znorm, i.e. M1/M1.1, group scores based on gallery sample's id/demographic, and then compute statistic and apply normalization; tnorm, i.e. M2/M2.1, use probe sample's id/demographic.
         id_criterion = "bio_ref" if method in ["M1","M1.1"] else "probe"
         demo_critierion = "probe" if method in ["M1","M1.1"] else "bio_ref"
@@ -119,11 +120,11 @@ def compute_stats(raw,cohort,demo_name,demo,method):
             raw = raw.drop(columns=['mean', 'std','bio_ref_key','score'])
             raw.rename(columns={'normalized_score':'score'}, inplace=True)
             post_scores = raw
-        
+
         elif method == "M1.1" or method == "M2.1": ## subject-demo-based, so get all impostor scores per gallery/probe sample per demographic group
 
             cohort["bio_ref_key"] = cohort["bio_ref_subject_id"] + "/" + cohort["bio_ref_reference_id"]
-                
+
             group_stats = cohort.groupby([f'{id_criterion}_key', f'{demo_critierion}_{demo_name}'])['score'].agg(['mean', 'std']).reset_index()
 
             raw["bio_ref_key"] = raw["bio_ref_subject_id"] + "/" + raw["bio_ref_reference_id"]
@@ -145,5 +146,6 @@ def normalize(raw,cohort,demo_name,demo,method,output):
     cohort = read_scores(cohort)
 
     ## compute statistics based on cohort scores and apply them to normalize raw scores
+    print("Computing normalized scores")
     post_scores = compute_stats(raw,cohort,demo_name,demo,method)
-    save(post_scores,os.path.join(output,f"{method}_normed.csv"))
+    save(post_scores,output)

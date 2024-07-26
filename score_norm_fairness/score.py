@@ -109,59 +109,59 @@ def save(scores,output):
     df.to_csv(output,header=True,index=False)
 
 
-def standard_score(data,output=None,file_name=None,compare_type=("cohort","test"),same_demo_compare=None):
+def standard_score(data,raw_file,file_name,compare_type=("cohort","test"),same_demo_compare=None):
 
     probe = data.probes()
     ref = data.references()
     probe_features = load_features(probe)
     ref_features = load_features(ref)
 
-    raw_scores = compute_scores(probe_features,ref_features)
-    os.makedirs(output, exist_ok=True)
+    if not os.path.isfile(raw_file):
+        print("Computing raw scores")
+        raw_scores = compute_scores(probe_features,ref_features)
+        save(raw_scores,raw_file)
 
-    save(raw_scores,os.path.join(output,"raw.csv"))
+    print("Computing cohort scores")
+    if compare_type == ("cohort","test"):
+        tref = data.treferences()
+        tref_features = load_features(tref)
+        all_vs_all = True
+        norm_scores = compute_scores(probe_features,tref_features,all_vs_all,same_demo_compare)
+    elif compare_type == ("test","cohort"):
+        zprobe = data.zprobes()
+        zprobe_features = load_features(zprobe)
+        all_vs_all = False
+        norm_scores = compute_scores(zprobe_features,ref_features,all_vs_all,same_demo_compare)
+    elif compare_type == ("cohort","cohort"):
+        zprobe, tref = data.cohort_based_trainsamples()
+        zprobe_features = load_features(zprobe)
+        tref_features = load_features(tref)
+        all_vs_all = False
+        norm_scores = compute_scores(zprobe_features,tref_features,all_vs_all,same_demo_compare)
 
-    if file_name:
-        if compare_type == ("cohort","test"):
-            tref = data.treferences()
-            tref_features = load_features(tref)
-            all_vs_all = True
-            norm_scores = compute_scores(probe_features,tref_features,all_vs_all,same_demo_compare)
-        elif compare_type == ("test","cohort"):
-            zprobe = data.zprobes()
-            zprobe_features = load_features(zprobe)
-            all_vs_all = False
-            norm_scores = compute_scores(zprobe_features,ref_features,all_vs_all,same_demo_compare)
-        elif compare_type == ("cohort","cohort"):
-            zprobe, tref = data.cohort_based_trainsamples()
-            zprobe_features = load_features(zprobe)
-            tref_features = load_features(tref)
-            all_vs_all = False
-            norm_scores = compute_scores(zprobe_features,tref_features,all_vs_all,same_demo_compare)
-
-        save(norm_scores,os.path.join(output,file_name)+".csv")
+    save(norm_scores,file_name)
 
 
-def rfw_score(data_directory,protocol_directory,protocol,train_sample,same_race,output=None,file_name=None,compare_type=("cohort","test")):
+def rfw_score(data_directory,protocol_directory,protocol,train_sample,same_race,raw_file=None,file_name=None,compare_type=("cohort","test")):
 
     data = RFW(data_directory=data_directory,protocol_directory=protocol_directory,protocol=protocol,data_type="feature", train_sample=train_sample, same_race=same_race)
     if same_race: same_demo_compare = "race"
     else: same_demo_compare = None
     standard_score(
         data=data,
-        output=output,
+        raw_file=raw_file,
         file_name=file_name,
         compare_type=compare_type,
         same_demo_compare=same_demo_compare
     )
 
 
-def vgg_score(data_directory,protocol_directory,same_demo_test=None,same_demo_train=None,output=None,file_name=None,compare_type=("cohort","test")):
+def vgg_score(data_directory,protocol_directory,protocol,same_demo_test=None,same_demo_train=None,raw_file=None,file_name=None,compare_type=("cohort","test")):
 
-    data = VGG2(data_directory=data_directory,protocol_directory=protocol_directory,data_type="feature", same_demo_test=same_demo_test, same_demo_train=same_demo_train)
+    data = VGG2(data_directory=data_directory,protocol_directory=protocol_directory,data_type="feature", protocol=protocol,same_demo_test=same_demo_test, same_demo_train=same_demo_train)
     standard_score(
         data=data,
-        output=output,
+        raw_file=raw_file,
         file_name=file_name,
         compare_type=compare_type,
         same_demo_compare=same_demo_train

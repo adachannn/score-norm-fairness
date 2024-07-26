@@ -1,10 +1,10 @@
 #!/usr/bin/bash
 
-if [ ! -d features ]; then
-    mkdir features
+if [ ! -d embedding ]; then
+    mkdir embedding
 fi
 
-cd features
+cd embedding
 wget -O RFW_E1.tar.gz "https://seafile.ifi.uzh.ch/d/46473c78a796425a8022/files/?p=%2Fpretrained_features%2FRFW_features%2FRFW_E1.tar.gz&dl=1"
 wget -O RFW_E2.tar.gz "https://seafile.ifi.uzh.ch/d/46473c78a796425a8022/files/?p=%2Fpretrained_features%2FRFW_features%2FRFW_E2.tar.gz&dl=1"
 wget -O RFW_E3.tar.gz "https://seafile.ifi.uzh.ch/d/46473c78a796425a8022/files/?p=%2Fpretrained_features%2FRFW_features%2FRFW_E3.tar.gz&dl=1"

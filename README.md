@@ -152,6 +152,12 @@ werm-report -d rfw -s /path/to/SCORES -t TITLES -o /path/to/output
 
 ```
 
+### Complete runs
+
+For complete runs, please look into directory `scripts`, where you can find two scripts `vgg2.sh` and `rfw.sh` for running all experiments on the two datasets.
+Also, `evaluate.sh` can be used to evaluate the results and plot the WERM report for a given dataset, protocol, demographic and selected extractors and score normalization methods.
+
+
 ## Supplemental
 
 Here we show the supplemental results that are promised in the paper.

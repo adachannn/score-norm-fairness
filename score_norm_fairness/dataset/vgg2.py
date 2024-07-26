@@ -48,7 +48,7 @@ class VGG2(torch.utils.data.Dataset):
         self,
         data_directory,
         protocol_directory,
-        protocol="vgg2-short-demo",
+        protocol="short-demo",
         data_type="image",
         same_demo_test=None,
         same_demo_train=None,
@@ -59,7 +59,7 @@ class VGG2(torch.utils.data.Dataset):
 
         protocol_directory: str, directory to protocols
 
-        protocol: str (vgg2-short-demo, vgg2-full-demo), protocol name
+        protocol: str (short-demo, full-demo), protocol name
 
         data_type: str (image, feature)
 
@@ -69,11 +69,11 @@ class VGG2(torch.utils.data.Dataset):
         """
         if data_directory is None or not os.path.exists(data_directory):
             raise ValueError(
-                "Invalid or non existant `data_directory`: f{data_directory}"
+                f"Invalid or non existent `data_directory`: {data_directory}"
             )
         if protocol_directory is None or not os.path.exists(protocol_directory):
             raise ValueError(
-                "Invalid or non existant `protocol_directory`: f{protocol_directory}"
+                f"Invalid or non existent `protocol_directory`: {protocol_directory}"
             )
 
         # self._check_protocol(protocol)
@@ -82,7 +82,7 @@ class VGG2(torch.utils.data.Dataset):
 
         self.data_directory = data_directory
         self.protocol_directory = protocol_directory
-        self.protocol = protocol
+        self.protocol = "vgg2-"+protocol
         self.data_type = data_type
         self.same_demo_test = same_demo_test
         self.same_demo_train = same_demo_train
@@ -238,6 +238,6 @@ class VGG2(torch.utils.data.Dataset):
 
     def protocols():
         return [
-            "vgg2-short-demo",
-            "vgg2-full-demo",
+            "short-demo",
+            "full-demo",
         ]

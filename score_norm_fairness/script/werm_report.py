@@ -625,7 +625,7 @@ def get_args(command_line_options = None):
     parser.add_argument("--dataset","-d", choices=("rfw", "vgg2"), default = "rfw", help = "Dataset, possible choices: rfw, vgg2")
     parser.add_argument("--scores-directories","-s", nargs="+", required=True, help = "A space-separated list of directories for csv scores files")
     parser.add_argument("--titles","-t", nargs="+", required=True, help = "A space-separated list of titles correspond to the scores")
-    parser.add_argument("--variable-suffix","-v", choices=("race", "gender"), default = "race", type=str, help = "Demographic group name used to compute fairness, used only for VGGFace2 dataset, posible choices: race, gender")
+    parser.add_argument("--variable-suffix","-v", choices=("race", "gender"), default = "race", type=str, help = "Demographic group name used to compute fairness, used only for VGGFace2 dataset, possible choices: race, gender")
     parser.add_argument("--output-filename","-o", default = "werm_report.pdf", type=str, help = "OUTPUT pdf file path, to save all generated plots")
 
     args = parser.parse_args(command_line_options)
@@ -645,6 +645,6 @@ def main():
         vgg2_report(
             scores = args.scores_directories,
             output_filename = args.output_filename,
-            variable_suffix = agrs.variable_suffix,
+            variable_suffix = args.variable_suffix,
             titles=args.titles,
         )
