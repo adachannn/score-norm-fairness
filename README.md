@@ -47,7 +47,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Datasets & Pretrained Weights
 
 This package can be used in various ways.
-The protocol files are always required, so please [download these protocol files](https://seafile.ifi.uzh.ch/d/46473c78a796425a8022) and extract them into the current directory.
+The protocol files are always required, so please [download these protocol files](https://seafile.ifi.uzh.ch/f/c1623c5b26004f56b5ba/?dl=1) and extract them into the current directory.
 Linux users can also make use of our provided script:
 
 ```
@@ -56,9 +56,10 @@ $ bash scripts/download_protocol.sh
 
 ### Running with pre-extracted features
 
-The easiest way is to make use of our pre-extracted features, which you can [download from here](https://seafile.ifi.uzh.ch/f/0fc877a36db84fdf9627)
+The easiest way is to make use of our pre-extracted features, which you can [download from here](https://seafile.ifi.uzh.ch/d/da7c9d75790b4f8498ef/)
 and extract them into the current directory.
 These are the exact features used to generate the results shown in the paper.
+(Note: There is no extracted feature for protocol ``vgg2-full-demo``.)
 Linux users can also make use of our provided script:
 
 ```
@@ -93,10 +94,6 @@ Download the pretrained weights used in the paper:
 - E5: DaliID: https://github.com/Gabrielcb/DaliID
 
 [//]: # (Distortion-adaptive learned invariance for identification – a robust technique for face recognition and person re-identification.)
-
-#### Extract features:
-
-
 
 
 
