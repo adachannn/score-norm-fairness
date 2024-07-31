@@ -6,6 +6,7 @@ dependencies:
   - python=3.10
   - pytorch
   - scikit-learn
+  - scikit-image
   - pandas
   - matplotlib
   - h5py
@@ -18,4 +19,6 @@ dependencies:
   - pip:
     - dask
     - dask[dataframe]
+    - opencv-python
+    - torchvision
     - -e . # Install this package as well

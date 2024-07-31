@@ -95,6 +95,15 @@ Download the pretrained weights used in the paper:
 
 [//]: # (Distortion-adaptive learned invariance for identification – a robust technique for face recognition and person re-identification.)
 
+Example Code to extract deep features using E5 and an example image from RFW dataset, so please download the pre-trained weight as above before run below: 
+
+```
+$ python3 score_norm_fairness/extractor/extractor.py
+```
+
+The features used in the paper are extracted via [Bob framework](https://gitlab.idiap.ch/bob/bob.bio.face).
+You are also welcome to try this.
+The image preprocessing in Bob is not identical with the one we provide in the above script, so there will be a little difference in the extracted features.
 
 
 ## Usage
