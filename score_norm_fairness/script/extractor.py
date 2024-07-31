@@ -6,6 +6,16 @@ from PIL import Image
 import skimage
 from skimage import transform
 from torchvision.transforms import transforms
+from score_norm_fairness.extractor import iresnet100
+import argparse
+
+"""
+    Example script for extracting features by a pre-trained model
+    
+    Please download the pretrained weight from https://github.com/Gabrielcb/DaliID and run this script
+"""
+
+
 
 class FaceAlign:
     """
@@ -44,7 +54,6 @@ def model_loader(weight):
     """
         Load pre-trained weight to the model framework
     """
-    from E5 import iresnet100
     model = iresnet100()
     model.load_state_dict(torch.load(weight,map_location="cpu", weights_only=True))
     model.eval()
@@ -56,7 +65,9 @@ def feature_extractor(weight):
         Example code to load pre-trained weight, preprocess the example image (from RFW dataset), and forward it into the model and extract deep features, the desired shape should be (512,)
     """
     # Load model and instantiate the face cropper
+
     model = model_loader(weight)
+    print("Model Loaded")
     align = FaceAlign()
 
     # load image and facial landmarks
@@ -67,11 +78,25 @@ def feature_extractor(weight):
     image = align.transform(img,annotation)
     transform = transforms.ToTensor()
     image = transform(image)
+    print("Image Preprocessed")
     
     # Forward the cropped image into model and extract deep features
     feature = model(image.unsqueeze(0))[0]
 
-    print(feature.shape)
+    print(f"Feature extracted with shape {feature.shape}")
 
-# Please download the pretrained weight from https://github.com/Gabrielcb/DaliID and run this script
-feature_extractor("./pretrained_weights/E5.pt")
+
+def get_args(command_line_options = None):
+
+    parser = argparse.ArgumentParser("example_extractor",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("--weight","-w", required=True, help = "download the pretrained weight and enter its saved path here")
+
+    args = parser.parse_args(command_line_options)
+
+    return args
+
+
+def main():
+    args = get_args()
+    feature_extractor(args.weight)

@@ -27,6 +27,7 @@ score-norm    = "score_norm_fairness.script.score_norm:main"
 werm-report   = "score_norm_fairness.script.werm_report:main"
 tmr-table     = "score_norm_fairness.script.tmr_table:main"
 visualization = "score_norm_fairness.script.visualization:main"
+extractor     = "score_norm_fairness.script.extractor:main"
 
 [project.urls]
 "Homepage" = "https://github.com/AIML-IfI/score-norm-fairness"
