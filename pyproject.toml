@@ -7,7 +7,7 @@ name = "score-norm-fairness"
 version = "0.1.0"
 authors = [
     {name="Yu Linghu", email="linghu@ifi.uzh.ch"},
-    { name="Manuel Guenther", email="siebenkopf@googlemail.com"},
+    {name="Manuel Guenther", email="siebenkopf@googlemail.com"},
 ]
 description = "Source code for paper Score Normalization for Demographic Fairness in Face Recognition"
 readme = "README.md"
@@ -26,7 +26,7 @@ dependencies = {file = ["requirements.txt"]}
 score-norm    = "score_norm_fairness.script.score_norm:main"
 werm-report   = "score_norm_fairness.script.werm_report:main"
 tmr-table     = "score_norm_fairness.script.tmr_table:main"
-
+visualization = "score_norm_fairness.script.visualization:main"
 
 [project.urls]
 "Homepage" = "https://github.com/AIML-IfI/score-norm-fairness"
