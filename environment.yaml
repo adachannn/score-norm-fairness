@@ -5,6 +5,7 @@ channels:
 dependencies:
   - python=3.10
   - pytorch
+  - torchvision
   - scikit-learn
   - scikit-image
   - pandas
@@ -20,5 +21,4 @@ dependencies:
     - dask
     - dask[dataframe]
     - opencv-python
-    - torchvision
     - -e . # Install this package as well
