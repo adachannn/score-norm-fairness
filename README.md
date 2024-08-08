@@ -98,7 +98,7 @@ Download the pretrained weights used in the paper:
 Example Code to extract deep features using E5 and an example image from RFW dataset, so please download the pre-trained weight as above and modify its path before run below: 
 
 ```
-$ bash scripts/extractor.py
+$ bash scripts/extractor.sh
 ```
 
 The features used in the paper are extracted via [Bob framework](https://gitlab.idiap.ch/bob/bob.bio.face).
