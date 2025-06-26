@@ -1,7 +1,12 @@
 import pandas as pd
 import os
+import sys
+
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import h5py
-from .dataset import RFW, VGG2
+from dataset import RFW, VGG2
 from collections import defaultdict
 from tqdm import tqdm
 from scipy.spatial.distance import cdist
@@ -42,7 +47,15 @@ def compute_scores(probes,gallery,all_vs_all=False,same_demo_compare=None):
     scores = defaultdict(dict)
     if not all_vs_all:
         for sample in tqdm(probes):
+            if "feature" not in probes[sample]:
+                print(f"Skipping probe sample {sample} — missing 'feature'")
+                continue
+
             for ref in probes[sample]["references"]:
+                if ref not in gallery or "feature" not in gallery[ref]:
+                    print(f"Skipping gallery ref {ref} — missing or invalid in gallery")
+                    continue
+
                 # score = 2 - scipy.spatial.distance.cosine(probes[sample]["feature"],gallery[ref]["feature"])
                 score = -1 * cdist(probes[sample]["feature"].reshape(1, -1),gallery[ref]["feature"].reshape(1, -1), "cosine")
 
@@ -63,11 +76,18 @@ def compute_scores(probes,gallery,all_vs_all=False,same_demo_compare=None):
                 reference_lists[gallery[ref][same_demo_compare]].append(ref)
 
         for sample in tqdm(probes):
+            if "feature" not in probes[sample]:
+                print(f"Skipping probe sample {sample} — missing 'feature'")
+                continue
+
             if same_demo_compare:
                 gallery_samples = reference_lists[probes[sample][same_demo_compare]]
             else: ## if cross demo pairs are necessary, then take the entire gallery
                 gallery_samples = gallery
             for ref in gallery_samples:
+                if ref not in gallery or "feature" not in gallery[ref]:
+                    print(f"Skipping gallery ref {ref} — missing 'feature'")
+                    continue
                 score = -1 * cdist(probes[sample]["feature"].reshape(1, -1),gallery[ref]["feature"].reshape(1, -1), "cosine")
 
                 key = (probes[sample]["key"],ref)
@@ -143,7 +163,6 @@ def standard_score(data,raw_file,file_name,compare_type=("cohort","test"),same_d
 
 
 def rfw_score(data_directory,protocol_directory,protocol,train_sample,same_race,raw_file=None,file_name=None,compare_type=("cohort","test")):
-
     data = RFW(data_directory=data_directory,protocol_directory=protocol_directory,protocol=protocol,data_type="feature", train_sample=train_sample, same_race=same_race)
     if same_race: same_demo_compare = "race"
     else: same_demo_compare = None
