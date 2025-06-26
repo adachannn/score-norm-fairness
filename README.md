@@ -84,8 +84,6 @@ Models E1 to E5 are publicly available pre-trained networks used in the paper. Y
 
 [//]: # (Distortion-adaptive learned invariance for identification – a robust technique for face recognition and person re-identification.)
 
-`score_norm_fairness/script/extractor.py` is the example code to extract deep features from RFW and BUPT-BalancedFace(as cohorts set) datasets using E6 model. Please change the image directory accordingly to where it stores the images. If you want to use another dataset, please modify the code accordingly. After the `score_norm_fairness/script/extractor.py` is correctly set, modify the `extractor.sh` with the pre-trained weight's path before run below:
-
 `score_norm_fairness/script/extractor.py` provides example code to extract deep features from the RFW and BUPT-BalancedFace (used as the cohort set) datasets using the E6 model. Please ensure the image directory path is correctly set according to your dataset. If you're using a different dataset, adjust the code accordingly. Once the code is correctly configured, edit the `extractor.sh` script to point to the correct path of your pre-trained weights, and then run:
 
 ```
